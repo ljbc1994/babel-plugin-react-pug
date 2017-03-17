@@ -15,7 +15,7 @@ export default class Leash {
 	 * @return { Object } AST of react function calls
 	 */
 	constructor(template, interpolations) {
-    this.interpolations = interpolations
+		this.interpolations = interpolations
 		this.ast = this.getAST(this.templatePlaceholder(template))
 		
 		return this.initialise()

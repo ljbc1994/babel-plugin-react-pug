@@ -23,7 +23,7 @@ class Profile extends React.Component {
 ### Out
 
 ```js
-class List extends React.Component {
+class Profile extends React.Component {
     ...
     render() {
         return React.createElement('div', { id: 'profile', className: 'profile__container' },
