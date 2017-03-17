@@ -1,0 +1,30 @@
+{
+ "name": "babel-plugin-react-pug",
+ "version": "0.0.1",
+ "description": "Convert Pug into React function calls.",
+ "keywords": "pug, react, babel-plugin",
+ "main": "lib/index.js",
+ "author": "Louie Colgan <ljbc94@gmail.com>",
+ "license": "MIT",
+ "scripts": {
+  "prepublish": "npm run build",
+  "build": "babel src --out-dir lib"
+ },
+ "devDependencies": {
+  "babel": "^6.23.0",
+  "babel-cli": "^6.24.0",
+  "babel-core": "^6.24.0",
+  "babel-plugin-add-module-exports": "^0.2.1",
+  "babel-preset-stage-0": "^6.22.0",
+  "babel-register": "^6.24.0",
+	"babel-preset-env": "^1.2.2"
+ },
+ "dependencies": {
+  "babel-types": "^6.23.0",
+  "pug-lexer": "^3.0.0",
+  "pug-parser": "^2.0.2"
+ },
+ "files": [
+  "lib"
+ ]
+}
