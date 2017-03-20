@@ -105,7 +105,7 @@ export default class NodeBuilder {
 			let attrKey = t.identifier(this.convertAttributeKey(attr.name))
 			let attrVal = this.interpolate(attr.val, t.identifier)
 			
-			return t.objectProperty(attrKey, attrVal)
+			return t.objectProperty(attrKey, ...attrVal)
 			
 		})
 		
@@ -163,13 +163,28 @@ export default class NodeBuilder {
 	 */
 	interpolate(value, type) {
 		const matches = value.match(INTERPOLATE_REGEX)
-
+		
 		if (matches && matches.length) {
-			let id = matches[0].replace(NUMBER_REGEX, '')
-			return this.interpolations[id]
+			
+			let splitValue = value.split(INTERPOLATE_REGEX)
+			
+			return splitValue.reduce((arr, value, index) => {
+				
+				let valueArr = value ? [t.stringLiteral(value)] : []
+				let match = matches[index]
+					
+				if (match) {
+					let id = match.replace(NUMBER_REGEX, '')
+					valueArr.push(this.interpolations[id])
+				}
+				
+				return arr.concat(valueArr)
+				
+			}, [])
+			
 		}
-
-		return type(value)
+		
+		return [ type(value) ]
 	}
 	
 	/**
