@@ -41,16 +41,15 @@ export default class NodeBuilder {
 		let fn = t.memberExpression(t.identifier('React'), t.identifier('createElement'))
 		let args = [t.stringLiteral(tagName), this.buildAttributes(attrsArr)]
 		
-		if (typeof subNodes !== undefined && subNodes.length) {
+		if (Array.isArray(subNodes) && subNodes.length) {
 			
 			let subNodeArrays = subNodes.filter(node => Array.isArray(node))
 			
 			if (subNodeArrays.length) {
-				let flattened = [].concat.apply([], subNodes)
-				args = args.concat(flattened)
-			} else {
-				args = args.concat(subNodes)	
-			}
+				subNodes = [].concat.apply([], subNodes)
+			} 
+			
+			args = args.concat(subNodes)
 			
 		}
 		
