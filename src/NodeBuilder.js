@@ -39,7 +39,7 @@ export default class NodeBuilder {
 	buildNode(tagName, attrsArr, subNodes) {
 		
 		let fn = t.memberExpression(t.identifier('React'), t.identifier('createElement'))
-		let args = [t.stringLiteral(tagName), this.buildAttributes(attrsArr)]
+		let args = [this.buildTag(tagName), this.buildAttributes(attrsArr)]
 		
 		if (Array.isArray(subNodes) && subNodes.length) {
 			
@@ -71,6 +71,20 @@ export default class NodeBuilder {
 			default:
 				return value
 		}
+	}
+	
+	/**
+	 * @function
+	 * Determine whether the tag is a component or an element
+	 * and return the AST node
+	 * @params { String } tagName - The tag name of the node
+	 * @returns { Object } The AST node
+	 */
+	buildTag(tagName) {
+		if (tagName.charAt(0) === tagName.charAt(0).toUpperCase()) {
+			return t.identifier(tagName)
+		}
+		return t.stringLiteral(tagName)
 	}
 	
 	/**

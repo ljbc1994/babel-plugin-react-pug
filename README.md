@@ -96,6 +96,21 @@ class Component extends React.Component {
 }
 ```
 
+### Components
+
+To include components you don't need to use interpolation, just ensure that the component name is capitalised. For example:
+
+```js
+class Component extends React.Component {
+    ...
+    render() {
+        return pug`
+            OtherComponent(attrKey="attrValue")
+        `
+    }
+}
+```
+
 ### Include
 
 You can include pug templates into your components, for example say you have `tpls/component-footer.pug`:
