@@ -1,5 +1,8 @@
 import * as t from 'babel-types'
 
+const INTERPOLATE_REGEX = /\/~[^>]~\//g
+const NUMBER_REGEX = /[^0-9]/g
+
 /**
  * @class NodeBuilder
  */
@@ -14,8 +17,9 @@ export default class NodeBuilder {
 	 * interpolations
 	 * @returns { Object } The react function call AST
 	 */
-	constructor(ast, interpolations) {
+	constructor(ast, interpolations, blocks) {
 		this.interpolations = interpolations
+		this.blocks = blocks
 		return this.processNode(ast)
 	}
 	
@@ -118,22 +122,32 @@ export default class NodeBuilder {
 	 */
 	processNode(node) {
 		
-		if (node.type === 'Block') {
-			return node.nodes.map(this.processNode.bind(this)).filter((node) => node !== undefined)
-		} 
-		if (node.type === 'Text') {
-			return this.interpolate(node.val, t.stringLiteral)
-		}
-		if (node.type === 'Tag') {
-			let hasNodes = node.block && node.block.nodes.length
-			return this.buildNode.bind(this)(
-				node.name, 
-				node.attrs, 
-				hasNodes ? this.processNode.bind(this)(node.block) : undefined
-			)	
-		}
-		if (node.type === 'Include') {
-			return this.processNode.bind(this)(node.file.ast)
+		let _processNode = this.processNode.bind(this)
+		let _buildNode = this.buildNode.bind(this)
+		let _findNamedBlock = this.findNamedBlock.bind(this)
+		
+		switch (node.type) {
+				
+			case 'Block':
+				return node.nodes.map(_processNode).filter((node) => node !== undefined)
+			
+			case 'NamedBlock':
+				let block = _findNamedBlock(node.name)
+				return block.nodes.map(_processNode).filter((node) => node !== undefined)
+				
+			case 'Text':
+				return this.interpolate(node.val, t.stringLiteral)
+				
+			case 'Tag':
+				let hasNodes = node.block && node.block.nodes.length
+				return _buildNode(node.name, node.attrs, hasNodes ? _processNode(node.block) : undefined)
+				
+			case 'Include':
+				return _processNode(node.file.ast)
+				
+			case 'Extends':
+				return _processNode(node.file.ast)[0]
+				
 		}
 		
 	}
@@ -145,10 +159,9 @@ export default class NodeBuilder {
 	 * interpolations
 	 * @params { String } value - The value of the element 
 	 * @params { Object } type - The type of the AST node
+	 * @returns { Object } The AST node(s)
 	 */
 	interpolate(value, type) {
-		const INTERPOLATE_REGEX = /\/~[^>]~\//g
-		const NUMBER_REGEX = /[^0-9]/g
 		const matches = value.match(INTERPOLATE_REGEX)
 
 		if (matches && matches.length) {
@@ -157,5 +170,15 @@ export default class NodeBuilder {
 		}
 
 		return type(value)
+	}
+	
+	/**
+	 * @function
+	 * Find the named block
+	 * @params { String } The name of the named block
+	 * @returns { Object } Pug ast of the named block
+	 */
+	findNamedBlock(name) {
+		return this.blocks.find((block) => block.name === name)
 	}
 }

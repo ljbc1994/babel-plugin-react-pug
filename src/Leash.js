@@ -17,7 +17,7 @@ export default class Leash {
 	 */
 	constructor(template, interpolations) {
 		this.interpolations = interpolations
-		this.ast = this.getAST(this.templatePlaceholder(template))
+		this.ast = this.getAST(this.manipulateTemplate(template))
 		
 		return this.initialise()
 	}
@@ -29,7 +29,14 @@ export default class Leash {
 	 * @return { Object } AST of react function calls
 	 */
 	initialise() {
-		return new NodeBuilder(this.ast.nodes[0], this.interpolations)
+		let rootNode = this.ast.nodes[0]
+		let blocks = undefined 
+		
+		if (rootNode.type === 'Extends') {
+			blocks = this.ast.nodes.slice(1)
+		}
+		
+		return new NodeBuilder(rootNode, this.interpolations, blocks)
 	}
 	
 	/**
@@ -40,17 +47,24 @@ export default class Leash {
 	 * @returns { Object } The react function call AST
 	 */
 	getAST(template) {
-		
-		let ast = pugLoader.string(template, {
+		return pugLoader.string(template, {
 			filename: 'component.pug',
 			lex: pugLexer,
 			parse: pugParser,
 			resolve: (filename, source, options) => {
-				return pugLoader.resolve(filename, source, options);
+				return pugLoader.resolve(filename, source, options)
 			}
 		})
-		
-		return ast
+	}
+	
+	/**
+	 * @function
+	 * Manipulate the pug template
+	 * @params { Array } template - Array of template sections
+	 * @returns { String } The pug template 
+	 */
+	manipulateTemplate(template) {
+		return this.templatePlaceholder(template)
 	}
 	
 	/**

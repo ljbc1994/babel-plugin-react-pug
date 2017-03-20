@@ -90,7 +90,7 @@ class Component extends React.Component {
     ...
     render() {
         return pug`
-            #component ${ this.state.list.map((item) => pug`li Hello!` }
+            #component ${ this.state.list.map((item) => pug`li Hello!`) }
         `
     }
 }
@@ -132,6 +132,38 @@ class Component extends React.Component {
                 .component__body
                     h1.component__subtitle ${ this.state.subtitle }
                 include ./tpls/component-footer.pug
+        `
+    }
+}
+```
+
+### Extend
+
+You can harness the awesome power of Pug's `extends` to have component template inheritance!
+
+For example, you could specify a base component template (`tpls/base-component.pug`):
+
+```html
+.component__container
+    block content
+.component__footer
+    h3 This is the footer!
+    block footer
+    p This is the sub footer text!
+```
+
+...Now reference this in the component:  
+
+```js
+class Component extends React.Component {
+    ...
+    render() {
+        return pug`
+            extends ./tpls/base-component.pug
+            block content
+            h2.component__title ${ this.state.title }
+            block footer
+                .footer__links ${ this.state.links.map((link) => pug`.link ${ link }`) } 
         `
     }
 }
