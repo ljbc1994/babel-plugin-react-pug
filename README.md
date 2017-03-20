@@ -161,7 +161,7 @@ class Component extends React.Component {
         return pug`
             extends ./tpls/base-component.pug
             block content
-            h2.component__title ${ this.state.title }
+                h2.component__title ${ this.state.title }
             block footer
                 .footer__links ${ this.state.links.map((link) => pug`.link ${ link }`) } 
         `
