@@ -15,13 +15,14 @@
   "babel-cli": "^6.24.0",
   "babel-core": "^6.24.0",
   "babel-plugin-add-module-exports": "^0.2.1",
+  "babel-preset-env": "^1.2.2",
   "babel-preset-stage-0": "^6.22.0",
-  "babel-register": "^6.24.0",
-	"babel-preset-env": "^1.2.2"
+  "babel-register": "^6.24.0"
  },
  "dependencies": {
   "babel-types": "^6.23.0",
   "pug-lexer": "^3.0.0",
+  "pug-load": "^2.0.5",
   "pug-parser": "^2.0.2"
  },
  "files": [

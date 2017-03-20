@@ -1,5 +1,7 @@
 .coveralls.yml
+yarn-error.log
+npm-debug.log
 node_modules
 coverage
-npm-debug.log
+example
 lib

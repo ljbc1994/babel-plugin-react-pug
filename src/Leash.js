@@ -1,5 +1,6 @@
 import pugLexer from 'pug-lexer'
 import pugParser from 'pug-parser'
+import pugLoader from 'pug-load'
 import NodeBuilder from './NodeBuilder'
 
 /**
@@ -39,7 +40,17 @@ export default class Leash {
 	 * @returns { Object } The react function call AST
 	 */
 	getAST(template) {
-		return pugParser(pugLexer(template))
+		
+		let ast = pugLoader.string(template, {
+			filename: 'component.pug',
+			lex: pugLexer,
+			parse: pugParser,
+			resolve: (filename, source, options) => {
+				return pugLoader.resolve(filename, source, options);
+			}
+		})
+		
+		return ast
 	}
 	
 	/**

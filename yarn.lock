@@ -1494,12 +1494,23 @@ pug-lexer:
     is-expression "^3.0.0"
     pug-error "^1.3.2"
 
+pug-load:
+  version "2.0.5"
+  resolved "https://registry.yarnpkg.com/pug-load/-/pug-load-2.0.5.tgz#eaaf46ccace8aff7461e0fad1e2b67305514f2c6"
+  dependencies:
+    object-assign "^4.1.0"
+    pug-walk "^1.1.1"
+
 pug-parser:
   version "2.0.2"
   resolved "https://registry.yarnpkg.com/pug-parser/-/pug-parser-2.0.2.tgz#53a680cfd05039dcb0c27d029094bc4a792689b0"
   dependencies:
     pug-error "^1.3.2"
     token-stream "0.0.1"
+
+pug-walk@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/pug-walk/-/pug-walk-1.1.1.tgz#b9976240d213692e6993fbc13ae1205c54052efe"
 
 punycode@^1.4.1:
   version "1.4.1"

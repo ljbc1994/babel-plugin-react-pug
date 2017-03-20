@@ -1,5 +1,3 @@
-import pugLexer from 'pug-lexer'
-import pugParser from 'pug-parser'
 import * as t from 'babel-types'
 
 /**
@@ -43,12 +41,37 @@ export default class NodeBuilder {
 		let fn = t.memberExpression(t.identifier('React'), t.identifier('createElement'))
 		let args = [t.stringLiteral(tagName), this.buildAttributes(attrsArr)]
 		
-		if (subNodes && subNodes.length) {
-			args = args.concat(subNodes)
+		if (typeof subNodes !== undefined && subNodes.length) {
+			
+			let subNodeArrays = subNodes.filter(node => Array.isArray(node))
+			
+			if (subNodeArrays.length) {
+				let flattened = [].concat.apply([], subNodes)
+				args = args.concat(flattened)
+			} else {
+				args = args.concat(subNodes)	
+			}
+			
 		}
-
+		
 		return t.callExpression(fn, args)
 		
+	}
+	
+	/**
+	 * @function
+	 * Convert attribute key into compatible React 
+	 * attribute
+	 * @params { String } value - The attribute to convert
+	 * @returns { String } The converted attribute
+	 */
+	convertAttributeKey(value) {
+		switch (value) {
+			case 'class':
+				return 'className'
+			default:
+				return value
+		}
 	}
 	
 	/**
@@ -62,8 +85,11 @@ export default class NodeBuilder {
 		
 		let args = attrsArr.map((attr) => {
 			
-			return t.objectProperty(t.identifier(attr.name), this.interpolate(attr.val, t.identifier))
-		
+			let attrKey = t.identifier(this.convertAttributeKey(attr.name))
+			let attrVal = this.interpolate(attr.val, t.identifier)
+			
+			return t.objectProperty(attrKey, attrVal)
+			
 		})
 		
 		return args.length ? t.objectExpression(args) : t.nullLiteral() 
@@ -87,7 +113,14 @@ export default class NodeBuilder {
 		}
 		if (node.type === 'Tag') {
 			let hasNodes = node.block && node.block.nodes.length
-			return this.buildNode.bind(this)(node.name, node.attrs, hasNodes ? this.processNode.bind(this)(node.block) : undefined)	
+			return this.buildNode.bind(this)(
+				node.name, 
+				node.attrs, 
+				hasNodes ? this.processNode.bind(this)(node.block) : undefined
+			)	
+		}
+		if (node.type === 'Include') {
+			return this.processNode.bind(this)(node.file.ast)
 		}
 		
 	}
