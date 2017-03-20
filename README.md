@@ -77,7 +77,7 @@ class Component extends React.Component {
     ...
     render() {
         return pug`
-            #component-id.component__class(onClick=${ this.state.componentTitle })
+            #component-id.component__class(onClick=${ this.state.updateComponent })
         `
     }
 }
