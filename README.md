@@ -13,9 +13,9 @@ class Profile extends React.Component {
     ...
     render() {
         return pug`
-#profile.profile__container
-    h1.profile__name ${this.state.name}
-`
+            #profile.profile__container
+            h1.profile__name ${this.state.name}
+        `
     }
 }
 ```

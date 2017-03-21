@@ -50,7 +50,7 @@ export default class NodeBuilder {
 			let subNodeArrays = subNodes.filter(node => Array.isArray(node))
 			
 			if (subNodeArrays.length) {
-				subNodes = [].concat.apply([], subNodes)
+				subNodes = [].concat(...subNodes)
 			} 
 			
 			args = args.concat(subNodes)
@@ -129,11 +129,11 @@ export default class NodeBuilder {
 		switch (node.type) {
 				
 			case 'Block':
-				return node.nodes.map(_processNode).filter((node) => node !== undefined)
+				return node.nodes.map(_processNode)
 			
 			case 'NamedBlock':
 				let block = _findNamedBlock(node.name)
-				return block.nodes.map(_processNode).filter((node) => node !== undefined)
+				return block.nodes.map(_processNode)
 				
 			case 'Text':
 				return this.interpolate(node.val, t.stringLiteral)
@@ -159,7 +159,7 @@ export default class NodeBuilder {
 	 * interpolations
 	 * @params { String } value - The value of the element 
 	 * @params { Object } type - The type of the AST node
-	 * @returns { Object } The AST node(s)
+	 * @returns { Array } The AST node(s)
 	 */
 	interpolate(value, type) {
 		const matches = value.match(INTERPOLATE_REGEX)
