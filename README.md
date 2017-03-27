@@ -4,6 +4,7 @@
 
 [![Build Status](https://travis-ci.org/ljbc1994/babel-plugin-react-pug.svg?branch=master)](https://travis-ci.org/ljbc1994/babel-plugin-react-pug)
 [![Coverage Status](https://coveralls.io/repos/github/ljbc1994/babel-plugin-react-pug/badge.svg?branch=master)](https://coveralls.io/github/ljbc1994/babel-plugin-react-pug?branch=master)
+[![dependencies Status](https://david-dm.org/ljbc1994/babel-plugin-react-pug/status.svg)](https://david-dm.org/ljbc1994/babel-plugin-react-pug)
 
 A nice little babel plugin that lets you use Pug over JSX, giving you a productive and readable alternative for defining React Component templates. In essence, the plugin transforms Pug templates into React function calls.   
 
@@ -69,7 +70,7 @@ class Profile extends React.Component {
     ...
     render() {
         return pug`
-            #profile_01.profile__card(title="Profile Title")
+            #profile__01.profile__card(title="Profile Title")
         `
     }
 }
@@ -199,6 +200,12 @@ require('babel-core').transform('code', {
     plugins: ['react-pug']
 });
 ```
+
+## Issues and Potential Features
+
+If you have any issues or bugs concerning `babel-plugin-react-pug`, please do not hesitate to raise an issue!
+
+Furthermore, if there are any features in Pug that you feel would be awesome to have - please raise an issue and I'll get back to you! 
 
 ## Licence
 
