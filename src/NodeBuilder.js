@@ -19,16 +19,7 @@ export default class NodeBuilder {
 	 */
 	constructor(ast, interpolations, blocks) {
 		this.interpolations = interpolations
-		this.blocks = blocks
-		return this.processNode(ast)
-	}
-	
-	/**
-	 * @function
-	 * Execute the processing of the Pug AST nodes
-	 * @returns { Object } The react function call AST
-	 */
-	build() {
+		this.blocks = blocks;
 		return this.processNode(ast)
 	}
 	

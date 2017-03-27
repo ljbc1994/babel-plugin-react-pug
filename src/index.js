@@ -14,6 +14,7 @@ export default function({ types: t }) {
 						
 						let { node } = path
  						
+						/* istanbul ignore else */
 						if (node.tag.name === METHOD_IDENTIFIER) {
 							
 							let { quasis, expressions } = node.quasi

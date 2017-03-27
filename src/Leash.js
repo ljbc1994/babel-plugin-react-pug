@@ -37,6 +37,10 @@ export default class Leash {
 		
 		if (rootNode.type === 'Extends') {
 			blocks = this.ast.nodes.slice(1)
+		} else {
+			if (this.ast.nodes.length > 1) {
+				throw new Error('You have to define a root element')
+			}
 		}
 		
 		return new NodeBuilder(rootNode, this.interpolations, blocks)
@@ -89,6 +93,7 @@ export default class Leash {
 		const hasTabs = rootLine.match(START_TABS_REGEX) || []
 		const hasSpaces = rootLine.match(START_SPACES_REGEX) || []
 		
+		/* istanbul ignore if */
 		if (!hasTabs.length && !hasSpaces.length) {
 			return template
 		}

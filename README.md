@@ -2,7 +2,7 @@
 
 > Chuck out JSX and use Pug!
 
-**WARNING: This project is still in active development**
+A nice little babel plugin that lets you use Pug over JSX, giving you a productive and readable alternative for defining React Component templates. In essence, the plugin transforms Pug templates into React function calls.   
 
 ## Example
 
@@ -40,6 +40,8 @@ $ yarn add babel-plugin-react-pug --dev
 
 ## Features
 
+`babel-plugin-react-pug` supports Pug features that make the most sense when using Pug as a template language for React. 
+
 ### Attributes
 
 #### Class
@@ -47,11 +49,11 @@ $ yarn add babel-plugin-react-pug --dev
 Using the pug class syntax will automatically rename the attribute to `className` - so you won't have to worry about this!
 
 ```js
-class Component extends React.Component {
+class Profile extends React.Component {
     ...
     render() {
         return pug`
-            .component__element
+            .profile__card
         `
     }
 }
@@ -60,11 +62,11 @@ class Component extends React.Component {
 #### Other Attributes / Events
 
 ```js
-class Component extends React.Component {
+class Profile extends React.Component {
     ...
     render() {
         return pug`
-            #component-id.component__class(componentAttr="componentVal")
+            #profile_01.profile__card(title="Profile Title")
         `
     }
 }
@@ -73,11 +75,11 @@ class Component extends React.Component {
 ...or with interpolations:
 
 ```js
-class Component extends React.Component {
+class Profile extends React.Component {
     ...
     render() {
         return pug`
-            #component-id.component__class(onClick=${ this.state.updateComponent })
+            #profile__01.profile__card(onClick=${ this.state.update })
         `
     }
 }
@@ -86,11 +88,11 @@ class Component extends React.Component {
 ### Loops
 
 ```js
-class Component extends React.Component {
+class ProfileList extends React.Component {
     ...
     render() {
         return pug`
-            #component ${ this.state.list.map((item) => pug`li Hello!`) }
+            ul#profile__list ${ this.state.profiles.map((item) => pug`li ${item.name}`) }
         `
     }
 }
@@ -101,11 +103,11 @@ class Component extends React.Component {
 To include components you don't need to use interpolation, just ensure that the component name is capitalised. For example:
 
 ```js
-class Component extends React.Component {
+class Profile extends React.Component {
     ...
     render() {
         return pug`
-            OtherComponent(attrKey="attrValue")
+            ProfileCard(cardImage=${ this.state.imgSrc })
         `
     }
 }
@@ -113,40 +115,42 @@ class Component extends React.Component {
 
 ### Include
 
-You can include pug templates into your components, for example say you have `tpls/component-footer.pug`:
+You can include pug templates into your components, for example say you have `tpls/profile-footer.pug`:
 
 ```html
-.component__footer
-    h4.component__footer__title This is the footer!
+.profile__footer
+    .profile__footer__img
+        img(src="http://placehold.it/200x200")
 ```
 
-...Now you can include the file in the component:
+...now you can include the file in the component:
 
 ```js
-class Component extends React.Component {
+class Profile extends React.Component {
     ...
     render() {
         return pug`
-            .component__container
-                h2.component__title ${ this.state.title }
-                .component__body
-                    h1.component__subtitle ${ this.state.subtitle }
-                include ./tpls/component-footer.pug
+            .profile__container
+                h1.profile__title ${ this.state.title }
+                .profile__body
+                    h2.profile__subtitle ${ this.state.subtitle }
+                include ./tpls/profile-footer.pug
         `
     }
 }
 ```
 
-### Extend
+### Extends
 
 You can harness the awesome power of Pug's `extends` to have component template inheritance!
 
-For example, you could specify a base component template (`tpls/base-component.pug`):
+For example, you could specify a base component template (`tpls/base-profile.pug`):
 
 ```html
-.component__container
+.profile__container
+    .profile__header
     block content
-.component__footer
+.profile__footer
     h3 This is the footer!
     block footer
     p This is the sub footer text!
@@ -155,15 +159,15 @@ For example, you could specify a base component template (`tpls/base-component.p
 ...Now reference this in the component:  
 
 ```js
-class Component extends React.Component {
+class Profile extends React.Component {
     ...
     render() {
         return pug`
-            extends ./tpls/base-component.pug
+            extends ./tpls/base-profile.pug
             block content
-                h2.component__title ${ this.state.title }
+                h2.profile__title ${ this.state.title }
             block footer
-                .footer__links ${ this.state.links.map((link) => pug`.link ${ link }`) } 
+                ul.profile__links ${ this.state.links.map((link) => pug`li.link ${ link }`) } 
         `
     }
 }
@@ -183,6 +187,14 @@ class Component extends React.Component {
 
 ```sh
 $ babel --plugins react-pug index.js
+```
+
+### Via Node API
+
+```sh
+require('babel-core').transform('code', {
+    plugins: ['react-pug']
+});
 ```
 
 ## Licence
