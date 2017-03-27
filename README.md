@@ -2,6 +2,9 @@
 
 > Chuck out JSX and use Pug!
 
+[![Build Status](https://travis-ci.org/ljbc1994/babel-plugin-react-pug.svg?branch=master)](https://travis-ci.org/ljbc1994/babel-plugin-react-pug)
+[![Coverage Status](https://coveralls.io/repos/github/ljbc1994/babel-plugin-react-pug/badge.svg?branch=master)](https://coveralls.io/github/ljbc1994/babel-plugin-react-pug?branch=master)
+
 A nice little babel plugin that lets you use Pug over JSX, giving you a productive and readable alternative for defining React Component templates. In essence, the plugin transforms Pug templates into React function calls.   
 
 ## Example
