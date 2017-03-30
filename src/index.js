@@ -1,13 +1,15 @@
+// @flow
+
 import Leash from './Leash'
 
 const METHOD_IDENTIFIER = 'pug'
 
-export default function({ types: t }) {
+export default function() {
 	
 	return {
 		
 		visitor: {
-			ReturnStatement(path) {
+			ReturnStatement(path: Object) {
 				
 				path.traverse({
 					TaggedTemplateExpression(path) {
@@ -19,7 +21,7 @@ export default function({ types: t }) {
 							
 							let { quasis, expressions } = node.quasi
 							
-							path.replaceWith(new Leash(quasis, expressions))
+							path.replaceWith(new Leash(quasis, expressions).initialise())
 							
 						}
 						

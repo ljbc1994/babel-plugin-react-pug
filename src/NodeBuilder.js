@@ -1,12 +1,27 @@
+// @flow
+
+import type { PugNode, PugAttributeNode } from './types/pug' 
+import type { BabelNode, BabelNodeResponse } from './types/babel'
+		
 import * as t from 'babel-types'
 
 const INTERPOLATE_REGEX = /\/~[^>]~\//g
 const NUMBER_REGEX = /[^0-9]/g
 
+const ERROR_MSGS = {
+	NO_NAMED_BLOCK: (blockName) => {
+		return `The block "${blockName}" has not been defined`
+	}
+}
+
 /**
  * @class NodeBuilder
  */
 export default class NodeBuilder {
+	
+	ast: PugNode;
+	interpolations: Array<BabelNode>;
+	blocks: ?Array<PugNode>;
 	
 	/**
 	 * @function
@@ -15,12 +30,16 @@ export default class NodeBuilder {
 	 * @params { Object } ast - The ast of the pug template
 	 * @params { Array } interpolations - Contains the 
 	 * interpolations
+	 * @params { Array } blocks - Named blocks 
 	 * @returns { Object } The react function call AST
 	 */
-	constructor(ast, interpolations, blocks) {
+	constructor(ast: PugNode, interpolations: Array<BabelNode>, blocks: ?Array<PugNode>) : BabelNodeResponse {
+		
 		this.interpolations = interpolations
 		this.blocks = blocks;
+		
 		return this.processNode(ast)
+	
 	}
 	
 	/**
@@ -31,7 +50,7 @@ export default class NodeBuilder {
 	 * @params { Array|undefined } subNodes - Array of function call ASTs
 	 * @returns { Object } The react function call node
 	 */
-	buildNode(tagName, attrsArr, subNodes) {
+	buildNode(tagName: string, attrsArr: Array<PugAttributeNode>, subNodes: BabelNodeResponse) : BabelNode {
 		
 		let fn = t.memberExpression(t.identifier('React'), t.identifier('createElement'))
 		let args = [this.buildTag(tagName), this.buildAttributes(attrsArr)]
@@ -45,7 +64,6 @@ export default class NodeBuilder {
 			} 
 			
 			args = args.concat(subNodes)
-			
 		}
 		
 		return t.callExpression(fn, args)
@@ -59,13 +77,15 @@ export default class NodeBuilder {
 	 * @params { String } value - The attribute to convert
 	 * @returns { String } The converted attribute
 	 */
-	convertAttributeKey(value) {
+	convertAttributeKey(value: string) : string {
+		
 		switch (value) {
 			case 'class':
 				return 'className'
 			default:
 				return value
 		}
+		
 	}
 	
 	/**
@@ -75,71 +95,109 @@ export default class NodeBuilder {
 	 * @params { String } tagName - The tag name of the node
 	 * @returns { Object } The AST node
 	 */
-	buildTag(tagName) {
+	buildTag(tagName: string) : BabelNode {
+		
 		if (tagName.charAt(0) === tagName.charAt(0).toUpperCase()) {
 			return t.identifier(tagName)
 		}
+		
 		return t.stringLiteral(tagName)
+		
 	}
 	
 	/**
+	 * Note: Add check for multiple classNames
 	 * @function
 	 * Convert the array of element attributes into an object expression
 	 * containing object properties
 	 * @params { Array<Object> } attrsArr - Array of element attributes
 	 * @returns { Object } The object expression or null node 
 	 */
-	buildAttributes(attrsArr) {
+	buildAttributes(attrsArr: Array<PugAttributeNode>) : BabelNode {
 		
-		let args = attrsArr.map((attr) => {
+		let argsObj = attrsArr.reduce((obj, { name, val }) => {
+					
+			if (obj.hasOwnProperty(name) && typeof obj[name] === 'string' && typeof val === 'string') {
+				obj[name] = `${obj[name].slice(0, -1)} ${val.slice(1)}`
+			} else {
+				obj[name] = val
+			}
+				
+			return obj
 			
-			let attrKey = t.identifier(this.convertAttributeKey(attr.name))
-			let attrVal = this.interpolate(attr.val, t.identifier)
+		}, {})
+		
+		let argsArr = Object.keys(argsObj).map((key) => {
+			
+			let attrKey = t.identifier(this.convertAttributeKey(key))
+			let attrVal = this.interpolate(argsObj[key], t.identifier)
 			
 			return t.objectProperty(attrKey, ...attrVal)
 			
 		})
 		
-		return args.length ? t.objectExpression(args) : t.nullLiteral() 
+		return argsArr.length ? t.objectExpression(argsArr) : t.nullLiteral() 
 		
 	}
 	
 	/**
 	 * @function
 	 * Recursively iterate over the Pug AST and convert
-	 * each node into a React function call representation
+	 * each node into a AST React function call
 	 * @params { Object } node - The Pug node
 	 * @returns { Object } The pug node / subnode
 	 */
-	processNode(node) {
+	processNode(node: PugNode) : BabelNodeResponse {
 		
-		let _processNode = this.processNode.bind(this)
-		let _buildNode = this.buildNode.bind(this)
-		let _findNamedBlock = this.findNamedBlock.bind(this)
+		const _processNode = this.processNode.bind(this)
+		const _buildNode = this.buildNode.bind(this)
+		const _processBlock = this.processBlock.bind(this)
+		
+		if (node == null || !node.hasOwnProperty('type')) {
+			return null
+		}
 		
 		switch (node.type) {
 				
 			case 'Block':
-				return node.nodes.map(_processNode)
-			
 			case 'NamedBlock':
-				let block = _findNamedBlock(node.name)
-				return block.nodes.map(_processNode)
+				return _processBlock(node)
 				
 			case 'Text':
 				return this.interpolate(node.val, t.stringLiteral)
 				
 			case 'Tag':
 				let hasNodes = node.block && node.block.nodes.length
-				return _buildNode(node.name, node.attrs, hasNodes ? _processNode(node.block) : undefined)
+				return _buildNode(node.name, node.attrs, hasNodes ? _processNode(node.block) : null)
 				
 			case 'Include':
 				return _processNode(node.file.ast)
 				
 			case 'Extends':
-				return _processNode(node.file.ast)[0]
+				let ast = _processNode(node.file.ast)
+				return Array.isArray(ast) ? ast[0] : null
 				
 		}
+		
+	}
+	
+	/**
+	 * @function
+	 * Check whether the block is named or default, then
+	 * map over the block's array of pug ast nodes. 
+	 * @params { Object } node - The pug ast node
+	 * @returns { Array<Object>|null } The AST nodes(s)
+	 */
+	processBlock(node: PugNode) {
+		
+		const _processNode = this.processNode.bind(this)
+		const _findNamedBlock = this.findNamedBlock.bind(this)
+
+		if (node.type === 'NamedBlock') {
+			node = _findNamedBlock(node.name || '')			
+		}
+		
+		return Array.isArray(node.nodes) ? node.nodes.map(_processNode) : null
 		
 	}
 	
@@ -149,10 +207,11 @@ export default class NodeBuilder {
 	 * the value and replace these with specified 
 	 * interpolations
 	 * @params { String } value - The value of the element 
-	 * @params { Object } type - The type of the AST node
+	 * @params { Function } type - The type of the AST node
 	 * @returns { Array } The AST node(s)
 	 */
-	interpolate(value, type) {
+	interpolate(value: string, type: Function) : Array<BabelNodeResponse> {
+		
 		const matches = value.match(INTERPOLATE_REGEX)
 		
 		if (matches && matches.length) {
@@ -166,7 +225,7 @@ export default class NodeBuilder {
 					
 				if (match) {
 					let id = match.replace(NUMBER_REGEX, '')
-					valueArr.push(this.interpolations[id])
+					valueArr.push(this.interpolations[parseInt(id)])
 				}
 				
 				return arr.concat(valueArr)
@@ -184,7 +243,17 @@ export default class NodeBuilder {
 	 * @params { String } The name of the named block
 	 * @returns { Object } Pug ast of the named block
 	 */
-	findNamedBlock(name) {
-		return this.blocks.find((block) => block.name === name)
+	findNamedBlock(name: string) : PugNode {
+		
+		if (Array.isArray(this.blocks)) {
+			let block = this.blocks.find((block) => block.name === name)
+			
+			if (block != null) {
+				return block
+			}
+		}
+		
+		throw new Error(ERROR_MSGS.NO_NAMED_BLOCK(name))
+		
 	}
 }

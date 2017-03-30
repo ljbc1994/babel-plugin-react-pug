@@ -1,0 +1,8 @@
+[ignore]
+.*/node_modules/spdx-correct/.*
+
+[include]
+
+[libs]
+
+[options]

@@ -1,3 +1,8 @@
+// @flow
+
+import type { PugNode, PugAttributeNode } from './types/pug' 
+import type { BabelNode, BabelNodeResponse } from './types/babel'
+
 import pugLexer from 'pug-lexer'
 import pugParser from 'pug-parser'
 import pugLoader from 'pug-load'
@@ -6,10 +11,22 @@ import NodeBuilder from './NodeBuilder'
 const START_TABS_REGEX = /^[\t]{0,}/g
 const START_SPACES_REGEX = /^[ ]{0,}/g
 
+const ERROR_MSGS = {
+	NO_AST_NODES: 'No AST node(s) could be generated from the provided pug template',
+	NO_AST_EXISTS: 'An AST could not be generated from the provided pug template',
+	MULTIPLE_ROOT_ELEMENTS: (numOfElements) => {
+		return `Only one root element can be defined, there are currently ${numOfElements} defined` 
+	}
+}
+
 /**
  * @class Leash
  */
 export default class Leash {
+	
+	template: Array<BabelNode>;
+	interpolations: Array<BabelNode>;
+	ast: PugNode;
 	
 	/**
 	 * @function
@@ -18,11 +35,11 @@ export default class Leash {
 	 * @params { Array } interpolations - The interpolations
 	 * @return { Object } AST of react function calls
 	 */
-	constructor(template, interpolations) {
+	constructor(template: Array<BabelNode>, interpolations: Array<BabelNode> = []) {
+		
 		this.interpolations = interpolations
 		this.ast = this.getAST(this.manipulateTemplate(template))
 		
-		return this.initialise()
 	}
 	
 	/**
@@ -31,19 +48,30 @@ export default class Leash {
 	 * call AST
 	 * @return { Object } AST of react function calls
 	 */
-	initialise() {
-		let rootNode = this.ast.nodes[0]
-		let blocks = undefined 
+	initialise() : NodeBuilder {
 		
-		if (rootNode.type === 'Extends') {
+		let rootNode 
+		const astExists = this.ast !== undefined
+		
+		if (astExists && Array.isArray(this.ast.nodes)) {
+			rootNode = this.ast.nodes[0]	
+		} else {
+			throw new Error([ERROR_MSGS.NO_AST_NODES, ERROR_MSGS.NO_AST_EXISTS][astExists ? 0 : 1])
+		}
+		
+		let blocks
+		const nodesLen = this.ast.nodes.length
+		
+		if (rootNode.type === 'Extends' && nodesLen >= 2) {
 			blocks = this.ast.nodes.slice(1)
 		} else {
 			if (this.ast.nodes.length > 1) {
-				throw new Error('You have to define a root element')
+				throw new Error(ERROR_MSGS.MULTIPLE_ROOT_ELEMENTS(nodesLen))
 			}
 		}
 		
 		return new NodeBuilder(rootNode, this.interpolations, blocks)
+		
 	}
 	
 	/**
@@ -53,7 +81,8 @@ export default class Leash {
 	 * the pug template containing placeholder values 
 	 * @returns { Object } The react function call AST
 	 */
-	getAST(template) {
+	getAST(template: string) : PugNode {
+		
 		return pugLoader.string(template, {
 			filename: 'component.pug',
 			lex: pugLexer,
@@ -62,6 +91,7 @@ export default class Leash {
 				return pugLoader.resolve(filename, source, options)
 			}
 		})
+		
 	}
 	
 	/**
@@ -70,11 +100,14 @@ export default class Leash {
 	 * @params { Array } template - Array of template sections
 	 * @returns { String } The pug template 
 	 */
-	manipulateTemplate(template) {
+	manipulateTemplate(template: Array<BabelNode>) : string {
+		
 		return this.templateWhitespace(this.templatePlaceholder(template))
+		
 	}
 	
 	/**
+	 * NOTE: This needs refactoring.
 	 * @function
 	 * Format the template depending on whether it contains
 	 * tabs or spaces. This allows for the user to align
@@ -82,7 +115,7 @@ export default class Leash {
 	 * @params { String } Pug template string
 	 * @returns { String } Formatted pug template string
 	 */
-	templateWhitespace(template) {
+	templateWhitespace(template: string) : string {
 		
 		const lines = template.split('\n')
 		
@@ -112,16 +145,16 @@ export default class Leash {
 	 * @function
 	 * Loop through the template sections, adding placeholders
 	 * for the projected interpolations
-	 * @params { Array } template - Array of template sections 
+	 * @params { Array<Object> } template - Array of template sections 
 	 * @returns { String } The string representation of the
 	 * pug template containing placeholder values
 	 */
-	templatePlaceholder(template) {
+	templatePlaceholder(template: Array<BabelNode>) : string {
 		
 		return template.map((section, index) => {
     
 			let hasValue = this.interpolations[index] !== undefined
-      
+			
 			let placeholder = hasValue ? ('/~' + index + '~/') : ''
       
 			return `${section.value.raw}${placeholder}`

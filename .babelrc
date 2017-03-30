@@ -3,6 +3,8 @@
     "add-module-exports"
   ],
   "presets": [
-    ["env", { "targets": { "node": 4 } }]
+		"stage-0",
+    ["env", { "targets": { "node": 4 } }],
+		"flow"
   ]
 }
