@@ -8,7 +8,7 @@
  "license": "MIT",
  "scripts": {
   "prepublish": "npm run build",
-  "build": "babel src --out-dir lib --ignore ./src/types/*.js",
+  "build": "babel src --out-dir lib",
   "test": "mocha --check-leaks --compilers js:babel-register",
   "coverage": "cross-env NODE_ENV=test nyc --reporter=text-lcov mocha --compilers js:babel-register | coveralls"
  },

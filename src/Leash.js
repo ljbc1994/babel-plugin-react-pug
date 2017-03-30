@@ -1,7 +1,7 @@
 // @flow
 
-import type { PugNode, PugAttributeNode } from './types/pug' 
-import type { BabelNode, BabelNodeResponse } from './types/babel'
+import type { PugNode, PugAttributeNode } from '../types/pug' 
+import type { BabelNode, BabelNodeResponse } from '../types/babel'
 
 import pugLexer from 'pug-lexer'
 import pugParser from 'pug-parser'
