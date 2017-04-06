@@ -6,17 +6,15 @@ import type { BabelNode } from '../types/babel'
 import pugLexer from 'pug-lexer'
 import pugParser from 'pug-parser'
 import pugLoader from 'pug-load'
+import pugLinker from 'pug-linker'
 import NodeBuilder from './NodeBuilder'
 
-const START_TABS_REGEX = /^[\t]{0,}/g
-const START_SPACES_REGEX = /^[ ]{0,}/g
+const START_TABS_REGEX = /^[\t]{1,}/g
+const START_SPACES_REGEX = /^[ ]{1,}/g
 
 const ERROR_MSGS = {
   NO_AST_NODES: 'No AST node(s) could be generated from the provided pug template',
-  NO_AST_EXISTS: 'An AST could not be generated from the provided pug template',
-  MULTIPLE_ROOT_ELEMENTS: (numOfElements) => {
-    return `Only one root element can be defined, there are currently ${numOfElements} defined`
-  }
+  NO_AST_EXISTS: 'An AST could not be generated from the provided pug template'
 }
 
 /**
@@ -55,18 +53,7 @@ export default class Leash {
       throw new Error([ERROR_MSGS.NO_AST_NODES, ERROR_MSGS.NO_AST_EXISTS][astExists ? 0 : 1])
     }
 
-    let blocks
-    const nodesLen = this.ast.nodes.length
-
-    if (rootNode.type === 'Extends' && nodesLen >= 2) {
-      blocks = this.ast.nodes.slice(1)
-    } else {
-      if (this.ast.nodes.length > 1) {
-        throw new Error(ERROR_MSGS.MULTIPLE_ROOT_ELEMENTS(nodesLen))
-      }
-    }
-
-    return new NodeBuilder(rootNode, this.interpolations, blocks)
+    return new NodeBuilder(rootNode, this.interpolations)
   }
 
   /**
@@ -77,7 +64,7 @@ export default class Leash {
    * @returns { Object } The react function call AST
    */
   getAST (template: string) : PugNode {
-    return pugLoader.string(template, {
+    let loadedAST = pugLoader.string(template, {
       filename: 'component.pug',
       lex: pugLexer,
       parse: pugParser,
@@ -85,6 +72,8 @@ export default class Leash {
         return pugLoader.resolve(filename, source, options)
       }
     })
+
+    return pugLinker(loadedAST)
   }
 
   /**
@@ -98,7 +87,6 @@ export default class Leash {
   }
 
   /**
-   * NOTE: This needs refactoring.
    * @function
    * Format the template depending on whether it contains
    * tabs or spaces. This allows for the user to align
@@ -108,20 +96,21 @@ export default class Leash {
    */
   templateWhitespace (template: string) : string {
     const lines = template.split('\n')
-
-    // Get the root line to find out whether the template
-    // contains spaces or tabs
     const rootLine = lines.filter((line) => line.length > 0)[0]
+    const hasTabs = rootLine.match(START_TABS_REGEX)
+    const hasSpaces = rootLine.match(START_SPACES_REGEX)
 
-    const hasTabs = rootLine.match(START_TABS_REGEX) || []
-    const hasSpaces = rootLine.match(START_SPACES_REGEX) || []
-
-    /* istanbul ignore if */
-    if (!hasTabs.length && !hasSpaces.length) {
+    if (!hasTabs && !hasSpaces) {
       return template
     }
 
-    const spacesArr = hasTabs[0].length >= 1 ? hasTabs[0] : hasSpaces[0]
+    let spacesArr = []
+
+    if (Array.isArray(hasTabs)) {
+      spacesArr = hasTabs[0]
+    } else if (Array.isArray(hasSpaces)) {
+      spacesArr = hasSpaces[0]
+    }
 
     let tpl = lines
       .map((line) => line.slice(spacesArr.length))

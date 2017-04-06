@@ -161,7 +161,7 @@ For example, you could specify a base component template (`tpls/base-profile.pug
     p This is the sub footer text!
 ```
 
-...Now reference this in the component:  
+...now reference this in the component:  
 
 ```js
 class Profile extends React.Component {
@@ -177,6 +177,40 @@ class Profile extends React.Component {
     }
 }
 ```
+
+#### Block append / prepend
+
+You can also use `append`  and `prepend` blocks in your React components.
+
+For example, if you have the following base component template (`tpls/base-profile.pug`):
+
+```html
+.profile__container
+    block content
+				h1.profile__title Profile
+.profile__footer
+    h3 This is the footer!
+    block footer
+    p This is the sub footer text!
+```
+
+...now reference this in the component, with the added keyword `append` to the block:
+
+```js
+class Profile extends React.Component {
+    ...
+    render() {
+        return pug`
+            extends ./tpls/base-profile.pug
+            block append content
+                h2.profile__name ${ this.state.name }
+            block footer
+                ul.profile__links ${ this.state.links.map((link) => pug`li.link ${ link }`) } 
+        `
+    }
+}
+```
+
 
 ## Usage
 

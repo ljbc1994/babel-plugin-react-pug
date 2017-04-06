@@ -1,6 +1,6 @@
 {
  "name": "babel-plugin-react-pug",
- "version": "0.1.3",
+ "version": "0.4.0",
  "description": "Convert Pug into React function calls.",
  "keywords": "pug, react, babel-plugin",
  "main": "lib/index.js",
@@ -9,15 +9,15 @@
  "scripts": {
   "prepublish": "npm run build",
   "build": "babel src --out-dir lib",
-	"static-test": "standard ./src/*.js && flow",
+  "static-test": "standard ./src/*.js && flow",
   "test": "mocha --check-leaks --compilers js:babel-register",
   "coverage": "cross-env NODE_ENV=test nyc --reporter=text-lcov mocha --compilers js:babel-register | coveralls"
  },
  "devDependencies": {
   "babel": "^6.23.0",
-	"babel-eslint": "^7.2.1",
   "babel-cli": "^6.24.0",
   "babel-core": "^6.24.0",
+  "babel-eslint": "^7.2.1",
   "babel-plugin-add-module-exports": "^0.2.1",
   "babel-plugin-istanbul": "^4.1.1",
   "babel-preset-env": "^1.2.2",
@@ -27,6 +27,7 @@
   "chai": "^3.5.0",
   "coveralls": "^2.12.0",
   "cross-env": "^3.2.4",
+  "eslint": "^3.19.0",
   "eslint-plugin-flowtype": "^2.30.4",
   "flow-bin": "^0.42.0",
   "glob": "^7.1.1",
@@ -37,6 +38,7 @@
  "dependencies": {
   "babel-types": "^6.23.0",
   "pug-lexer": "^3.0.0",
+  "pug-linker": "^2.0.2",
   "pug-load": "^2.0.5",
   "pug-parser": "^2.0.2"
  },
@@ -44,7 +46,7 @@
   "plugins": [
    "flowtype"
   ],
-	"parser": "babel-eslint"
+  "parser": "babel-eslint"
  },
  "files": [
   "lib"

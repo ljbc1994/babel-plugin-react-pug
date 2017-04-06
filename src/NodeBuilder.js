@@ -8,19 +8,12 @@ import * as t from 'babel-types'
 const INTERPOLATE_REGEX = /\/~[^>]~\//g
 const NUMBER_REGEX = /[^0-9]/g
 
-const ERROR_MSGS = {
-  NO_NAMED_BLOCK: (blockName) => {
-    return `The block "${blockName}" has not been defined`
-  }
-}
-
 /**
  * @class NodeBuilder
  */
 export default class NodeBuilder {
   ast: PugNode;
   interpolations: Array<BabelNode>;
-  blocks: ?Array<PugNode>;
 
   /**
    * @function
@@ -32,9 +25,8 @@ export default class NodeBuilder {
    * @params { Array } blocks - Named blocks
    * @returns { Object } The react function call AST
    */
-  constructor (ast: PugNode, interpolations: Array<BabelNode>, blocks: ?Array<PugNode>) : BabelNodeResponse {
+  constructor (ast: PugNode, interpolations: Array<BabelNode>) : BabelNodeResponse {
     this.interpolations = interpolations
-    this.blocks = blocks
 
     return this.processNode(ast)
   }
@@ -104,6 +96,8 @@ export default class NodeBuilder {
    * @returns { Object } The object expression or null node
    */
   buildAttributes (attrsArr: Array<PugAttributeNode>) : BabelNode {
+    // Ensure that duplicate attribute definitions are chained if
+    // they are strings - otherwise use the interpolated value
     let argsObj = attrsArr.reduce((obj, { name, val }) => {
       if (obj.hasOwnProperty(name) && typeof obj[name] === 'string' && typeof val === 'string') {
         obj[name] = `${obj[name].slice(0, -1)} ${val.slice(1)}`
@@ -134,7 +128,6 @@ export default class NodeBuilder {
   processNode (node: PugNode) : BabelNodeResponse {
     const _processNode = this.processNode.bind(this)
     const _buildNode = this.buildNode.bind(this)
-    const _processBlock = this.processBlock.bind(this)
 
     if (node == null || !node.hasOwnProperty('type')) {
       return null
@@ -143,7 +136,7 @@ export default class NodeBuilder {
     switch (node.type) {
       case 'Block':
       case 'NamedBlock':
-        return _processBlock(node)
+        return Array.isArray(node.nodes) ? node.nodes.map(_processNode) : null
 
       case 'Text':
         return this.interpolate(node.val, t.stringLiteral)
@@ -151,32 +144,7 @@ export default class NodeBuilder {
       case 'Tag':
         let hasNodes = node.block && node.block.nodes.length
         return _buildNode(node.name, node.attrs, hasNodes ? _processNode(node.block) : null)
-
-      case 'Include':
-        return _processNode(node.file.ast)
-
-      case 'Extends':
-        let ast = _processNode(node.file.ast)
-        return Array.isArray(ast) ? ast[0] : null
     }
-  }
-
-  /**
-   * @function
-   * Check whether the block is named or default, then
-   * map over the block's array of pug ast nodes.
-   * @params { Object } node - The pug ast node
-   * @returns { Array<Object>|null } The AST nodes(s)
-   */
-  processBlock (node: PugNode) {
-    const _processNode = this.processNode.bind(this)
-    const _findNamedBlock = this.findNamedBlock.bind(this)
-
-    if (node.type === 'NamedBlock') {
-      node = _findNamedBlock(node.name || '')
-    }
-
-    return Array.isArray(node.nodes) ? node.nodes.map(_processNode) : null
   }
 
   /**
@@ -208,23 +176,5 @@ export default class NodeBuilder {
     }
 
     return [ type(value) ]
-  }
-
-  /**
-   * @function
-   * Find the named block
-   * @params { String } The name of the named block
-   * @returns { Object } Pug ast of the named block
-   */
-  findNamedBlock (name: string) : PugNode {
-    if (Array.isArray(this.blocks)) {
-      let block = this.blocks.find((block) => block.name === name)
-
-      if (block != null) {
-        return block
-      }
-    }
-
-    throw new Error(ERROR_MSGS.NO_NAMED_BLOCK(name))
   }
 }

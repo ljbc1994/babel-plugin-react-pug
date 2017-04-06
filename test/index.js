@@ -5,11 +5,11 @@ import { assert } from 'chai'
 import { transformFileSync } from 'babel-core'
 import plugin from '../src/index'
 
-function trim(str) {
+function trim (str) {
   return str.replace(/(\r\n|\n|\r|\t)/gm, '')
 }
 
-function createTestName(fixturePath) {
+function createTestName (fixturePath) {
   return path.basename(fixturePath).split('-').join(' ')
 }
 
