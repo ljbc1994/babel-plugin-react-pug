@@ -187,7 +187,7 @@ For example, if you have the following base component template (`tpls/base-profi
 ```html
 .profile__container
     block content
-				h1.profile__title Profile
+        h1.profile__title Profile
 .profile__footer
     h3 This is the footer!
     block footer
