@@ -64,6 +64,11 @@ export default class NodeBuilder {
    * @returns { String } The converted attribute
    */
   convertAttributeKey (value: string) : string {
+    //HACK: Not sure if this is correct, but this is how you fix attributes like, aria-hidden, aria-label, etc...
+		if (value.indexOf('-') > -1) {
+			value = `'${value}'`
+		}
+
     switch (value) {
       case 'class':
         return 'className'
