@@ -2,6 +2,7 @@
 
 function render() {
 	return React.createElement("div", {
-		'aria-label': "Text"
+		'aria-label': "Text",
+		autoCorrect: true
 	}, "Text");
 }
