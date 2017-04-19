@@ -2,6 +2,7 @@
 
 import type { PugNode, PugAttributeNode } from '../types/pug'
 import type { BabelNode, BabelNodeResponse } from '../types/babel'
+import Translations from './translations'
 
 import * as t from 'babel-types'
 
@@ -68,12 +69,15 @@ export default class NodeBuilder {
       value = `'${value}'`
     }
 
-    switch (value) {
-      case 'class':
-        return 'className'
-      default:
-        return value
+    /*
+      NOTE: Borrowed from https://github.com/insin/babel-plugin-react-html-attrs
+      This works at the attribute level, the aforemention plugin only appears to works on the <JSX> syntax
+    */
+    if (value in Translations) {
+      value = Translations[value]
     }
+
+    return value;
   }
 
   /**
