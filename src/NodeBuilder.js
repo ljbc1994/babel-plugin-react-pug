@@ -65,16 +65,16 @@ export default class NodeBuilder {
    * @returns { String } The converted attribute
    */
   convertAttributeKey (value: string) : string {
-    if (value.indexOf('-') > -1) {
-      return `'${value}'`
-    }
-
     /**
      * NOTE: Borrowed from https://github.com/insin/babel-plugin-react-html-attrs
      * This works at the attribute level, the aforemention plugin only appears to works on the <JSX> syntax
      */
     if (value in translations) {
       return translations[value]
+    }
+
+    if (value.indexOf('-') > -1) {
+      return `'${value}'`
     }
 
     return value
