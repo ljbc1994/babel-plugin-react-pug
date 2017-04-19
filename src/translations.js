@@ -1,5 +1,4 @@
-module.exports = {
-
+export default {
   // DOM Property names
   'accesskey': 'accessKey',
   'allowfullscreen': 'allowFullScreen',
@@ -50,10 +49,9 @@ module.exports = {
   'itemtype': 'itemType',
   'itemref': 'itemRef',
   'itemid': 'itemID',
-
   // DOM Attribute names
   'class': 'className',
   'for': 'htmlFor',
   'accept-charset': 'acceptCharset',
   'http-equiv': 'httpEquiv'
-};
+}

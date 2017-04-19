@@ -2,9 +2,9 @@
 
 import type { PugNode, PugAttributeNode } from '../types/pug'
 import type { BabelNode, BabelNodeResponse } from '../types/babel'
-import Translations from './translations'
 
 import * as t from 'babel-types'
+import translations from './translations'
 
 const INTERPOLATE_REGEX = /\/~[^>]~\//g
 const NUMBER_REGEX = /[^0-9]/g
@@ -66,18 +66,18 @@ export default class NodeBuilder {
    */
   convertAttributeKey (value: string) : string {
     if (value.indexOf('-') > -1) {
-      value = `'${value}'`
+      return `'${value}'`
     }
 
-    /*
-      NOTE: Borrowed from https://github.com/insin/babel-plugin-react-html-attrs
-      This works at the attribute level, the aforemention plugin only appears to works on the <JSX> syntax
-    */
-    if (value in Translations) {
-      value = Translations[value]
+    /**
+     * NOTE: Borrowed from https://github.com/insin/babel-plugin-react-html-attrs
+     * This works at the attribute level, the aforemention plugin only appears to works on the <JSX> syntax
+     */
+    if (value in translations) {
+      return translations[value]
     }
 
-    return value;
+    return value
   }
 
   /**
