@@ -28,9 +28,9 @@ export default class Leash {
   /**
    * @function
    * Hook up the ast and interpolations required
-   * @params { Array } template - Sections of the pug template
-   * @params { Array } interpolations - The interpolations
-   * @return { Object } AST of react function calls
+   * @param { Array } template - Sections of the pug template
+   * @param { Array } interpolations - The interpolations
+   * @returns { Object } AST of react function calls
    */
   constructor (template: Array<BabelNode>, interpolations: Array<BabelNode> = []) {
     this.interpolations = interpolations
@@ -41,7 +41,7 @@ export default class Leash {
    * @function
    * Initialise converting the Pug AST into the react function
    * call AST
-   * @return { Object } AST of react function calls
+   * @returns { Object } AST of react function calls
    */
   initialise () : NodeBuilder {
     let rootNode
@@ -59,7 +59,7 @@ export default class Leash {
   /**
    * @function
    * Get the AST of the pug template
-   * @params { String } template - String representation of
+   * @param { String } template - String representation of
    * the pug template containing placeholder values
    * @returns { Object } The react function call AST
    */
@@ -79,7 +79,7 @@ export default class Leash {
   /**
    * @function
    * Manipulate the pug template
-   * @params { Array } template - Array of template sections
+   * @param { Array } template - Array of template sections
    * @returns { String } The pug template
    */
   manipulateTemplate (template: Array<BabelNode>) : string {
@@ -91,7 +91,7 @@ export default class Leash {
    * Format the template depending on whether it contains
    * tabs or spaces. This allows for the user to align
    * the template with the pug function
-   * @params { String } Pug template string
+   * @param { String } Pug template string
    * @returns { String } Formatted pug template string
    */
   templateWhitespace (template: string) : string {
@@ -123,7 +123,7 @@ export default class Leash {
    * @function
    * Loop through the template sections, adding placeholders
    * for the projected interpolations
-   * @params { Array<Object> } template - Array of template sections
+   * @param { Array<Object> } template - Array of template sections
    * @returns { String } The string representation of the
    * pug template containing placeholder values
    */

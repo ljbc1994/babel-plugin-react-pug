@@ -19,10 +19,10 @@ export default class NodeBuilder {
    * @function
    * Process the ast and hook up the
    * interpolations
-   * @params { Object } ast - The ast of the pug template
-   * @params { Array } interpolations - Contains the
+   * @param { Object } ast - The ast of the pug template
+   * @param { Array } interpolations - Contains the
    * interpolations
-   * @params { Array } blocks - Named blocks
+   * @param { Array } blocks - Named blocks
    * @returns { Object } The react function call AST
    */
   constructor (ast: PugNode, interpolations: Array<BabelNode>) : BabelNodeResponse {
@@ -34,9 +34,9 @@ export default class NodeBuilder {
   /**
    * @function
    * Build the react function call node
-   * @params { String } tagName - The tag name of the element
-   * @params { Array<Object> } attrsArr - Array of element attributes
-   * @params { Array|undefined } subNodes - Array of function call ASTs
+   * @param { String } tagName - The tag name of the element
+   * @param { Array<Object> } attrsArr - Array of element attributes
+   * @param { Array|undefined } subNodes - Array of function call ASTs
    * @returns { Object } The react function call node
    */
   buildNode (tagName: string, attrsArr: Array<PugAttributeNode>, subNodes: BabelNodeResponse) : BabelNode {
@@ -60,14 +60,13 @@ export default class NodeBuilder {
     * @function
    * Convert attribute key into compatible React
    * attribute
-   * @params { String } value - The attribute to convert
+   * @param { String } value - The attribute to convert
    * @returns { String } The converted attribute
    */
   convertAttributeKey (value: string) : string {
-    //HACK: Not sure if this is correct, but this is how you fix attributes like, aria-hidden, aria-label, etc...
-		if (value.indexOf('-') > -1) {
-			value = `'${value}'`
-		}
+    if (value.indexOf('-') > -1) {
+      value = `'${value}'`
+    }
 
     switch (value) {
       case 'class':
@@ -81,7 +80,7 @@ export default class NodeBuilder {
    * @function
    * Determine whether the tag is a component or an element
    * and return the AST node
-   * @params { String } tagName - The tag name of the node
+   * @param { String } tagName - The tag name of the node
    * @returns { Object } The AST node
    */
   buildTag (tagName: string) : BabelNode {
@@ -97,7 +96,7 @@ export default class NodeBuilder {
    * @function
    * Convert the array of element attributes into an object expression
    * containing object properties
-   * @params { Array<Object> } attrsArr - Array of element attributes
+   * @param { Array<Object> } attrsArr - Array of element attributes
    * @returns { Object } The object expression or null node
    */
   buildAttributes (attrsArr: Array<PugAttributeNode>) : BabelNode {
@@ -127,7 +126,7 @@ export default class NodeBuilder {
    * @function
    * Recursively iterate over the Pug AST and convert
    * each node into a AST React function call
-   * @params { Object } node - The Pug node
+   * @param { Object } node - The Pug node
    * @returns { Object } The pug node / subnode
    */
   processNode (node: PugNode) : BabelNodeResponse {
@@ -157,8 +156,8 @@ export default class NodeBuilder {
    * Check whether there are any placeholders within
    * the value and replace these with specified
    * interpolations
-   * @params { String } value - The value of the element
-   * @params { Function } type - The type of the AST node
+   * @param { String } value - The value of the element
+   * @param { Function } type - The type of the AST node
    * @returns { Array } The AST node(s)
    */
   interpolate (value: string, type: Function) : Array<BabelNodeResponse> {
