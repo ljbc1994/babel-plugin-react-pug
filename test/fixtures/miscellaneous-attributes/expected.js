@@ -3,6 +3,7 @@
 function render() {
 	return React.createElement("div", {
 		'aria-label': "Text",
-		autoCorrect: true
+		autoCorrect: true,
+		autoPlay: true
 	}, "Text");
 }

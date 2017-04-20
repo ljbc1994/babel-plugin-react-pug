@@ -96,7 +96,28 @@ export default class NodeBuilder {
   }
 
   /**
-   * Note: Add check for multiple classNames
+   * @function
+   * Build up an array of babel nodes for the attribute
+   * object expression.
+   * @param { Array<object> } attributes - The element attributes
+   * @returns { Array<Object> } An array of babel nodes
+   */
+  buildAttributesArr (attributes: Object) : Array<BabelNode> {
+    return Object.keys(attributes).map((key) => {
+      let attrKey = t.identifier(this.convertAttributeKey(key))
+      let attrVal = []
+
+      if (typeof attributes[key] === 'string') {
+        attrVal = attrVal.concat(this.interpolate(attributes[key], t.identifier))
+      } else {
+        attrVal.push(t.identifier(attributes[key]))
+      }
+
+      return t.objectProperty(attrKey, ...attrVal)
+    })
+  }
+
+  /**
    * @function
    * Convert the array of element attributes into an object expression
    * containing object properties
@@ -106,8 +127,8 @@ export default class NodeBuilder {
   buildAttributes (attrsArr: Array<PugAttributeNode>) : BabelNode {
     // Ensure that duplicate attribute definitions are chained if
     // they are strings - otherwise use the interpolated value
-    let argsObj = attrsArr.reduce((obj, { name, val }) => {
-      if (obj.hasOwnProperty(name) && typeof obj[name] === 'string' && typeof val === 'string') {
+    let attrsObj = attrsArr.reduce((obj, { name, val }) => {
+      if (name in obj && typeof obj[name] === 'string' && typeof val === 'string') {
         obj[name] = `${obj[name].slice(0, -1)} ${val.slice(1)}`
       } else {
         obj[name] = val
@@ -116,14 +137,9 @@ export default class NodeBuilder {
       return obj
     }, {})
 
-    let argsArr = Object.keys(argsObj).map((key) => {
-      let attrKey = t.identifier(this.convertAttributeKey(key))
-      let attrVal = this.interpolate(argsObj[key], t.identifier)
+    let attrsNodesArr = this.buildAttributesArr(attrsObj)
 
-      return t.objectProperty(attrKey, ...attrVal)
-    })
-
-    return argsArr.length ? t.objectExpression(argsArr) : t.nullLiteral()
+    return attrsNodesArr.length ? t.objectExpression(attrsNodesArr) : t.nullLiteral()
   }
 
    /**
