@@ -97,8 +97,8 @@ class Profile extends React.Component {
 class ProfileList extends React.Component {
     ...
     render() {
-        return this.state.profile.length
-            ? pug`ul#profile__list ${ this.state.profiles.map((item) => pug`li ${item.name}`) }`
+        return this.state.profiles.length
+            ? pug`ul#profile__list Your list of profiles.`
             : pug`p.profile__error An error has occurred.`
     }
 }
