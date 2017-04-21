@@ -85,8 +85,21 @@ class Profile extends React.Component {
     ...
     render() {
         return pug`
-            #profile__01.profile__card(onClick=${ this.state.update })
+            #profile__01.profile__card(onClick=${ this.update })
         `
+    }
+}
+```
+
+### Conditionals
+
+```js
+class ProfileList extends React.Component {
+    ...
+    render() {
+        return this.state.profile.length
+            ? pug`ul#profile__list ${ this.state.profiles.map((item) => pug`li ${item.name}`) }`
+            : pug`p.profile__error An error has occurred.`
     }
 }
 ```
