@@ -269,7 +269,14 @@ Furthermore, if there are any features in Pug that you feel would be awesome to 
 
 ## Contributions
 
-Any sort of contribution is welcome! 
+Any sort of contribution is welcome, just follow these steps:
+
+1. Fork the repo
+2. Create a feature branch `git checkout -b new-feature`
+3. Ensure the code meets the `standard` code style - just run `npm run static-test`
+3. Write a `fixture` test
+4. Commit and push your changes
+5. Submit a pull request!
 
 ## Licence
 
