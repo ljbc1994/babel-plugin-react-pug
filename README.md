@@ -274,9 +274,9 @@ Any sort of contribution is welcome, just follow these steps:
 1. Fork the repo
 2. Create a feature branch `git checkout -b new-feature`
 3. Ensure the code meets the `standard` code style - just run `npm run static-test`
-3. Write a `fixture` test
-4. Commit and push your changes
-5. Submit a pull request!
+4. Write a `fixture` test
+5. Commit and push your changes
+6. Submit a pull request!
 
 ## Licence
 
