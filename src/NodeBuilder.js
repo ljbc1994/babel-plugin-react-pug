@@ -40,11 +40,10 @@ export default class NodeBuilder {
    * @returns { Object } The react function call node
    */
   buildNode (tagName: string, attrsArr: Array<PugAttributeNode>, subNodes: BabelNodeResponse) : BabelNode {
-		
-		if (tagName === PLACEHOLDER_ID) {
+    if (tagName === PLACEHOLDER_ID) {
       return this.interpolations.shift()
     }
-		
+
     let fn = t.memberExpression(t.identifier('React'), t.identifier('createElement'))
     let args = [this.buildTag(tagName), this.buildAttributes(attrsArr)]
 
@@ -92,7 +91,6 @@ export default class NodeBuilder {
    * @returns { Object } The AST node
    */
   buildTag (tagName: string) : BabelNode {
-    
     if (tagName.charAt(0) === tagName.charAt(0).toUpperCase()) {
       return t.identifier(tagName)
     }
