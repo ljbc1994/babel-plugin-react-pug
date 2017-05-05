@@ -8,7 +8,7 @@
 [![Standard - JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 [![NPM Downloads](https://img.shields.io/npm/dm/babel-plugin-react-pug.svg?style=flat)](https://www.npmjs.com/package/babel-plugin-react-pug)
 
-A nice little babel plugin that lets you use Pug over JSX, giving you a productive and readable alternative for defining React Component templates. In essence, the plugin transforms Pug templates into React function calls. Supports React Native!
+A tiny, performant babel plugin that lets you use Pug over JSX, giving you a productive and readable alternative for defining React Component templates. In essence, the plugin transforms Pug templates into React function calls. Supports React Native!
 
 ## Example
 
