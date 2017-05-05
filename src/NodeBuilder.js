@@ -184,6 +184,10 @@ export default class NodeBuilder {
    * @returns { Array } The AST node(s)
    */
   interpolate (value: string, type: Function) : Array<BabelNodeResponse> {
+    if (value === PLACEHOLDER_ID) {
+      return [ this.interpolations.shift() ]
+    }
+
     const hasReplace = value.indexOf(PLACEHOLDER_ID) > -1
 
     if (hasReplace) {
