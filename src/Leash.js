@@ -11,6 +11,7 @@ import NodeBuilder from './NodeBuilder'
 
 const START_TABS_REGEX = /^[\t]{1,}/g
 const START_SPACES_REGEX = /^[ ]{1,}/g
+const PLACEHOLDER_ID = '_react_pug_replace'
 
 const ERROR_MSGS = {
   NO_AST_NODES: 'No AST node(s) could be generated from the provided pug template',
@@ -130,8 +131,7 @@ export default class Leash {
   templatePlaceholder (template: Array<BabelNode>) : string {
     return template.map((section, index) => {
       let hasValue = this.interpolations[index] !== undefined
-
-      let placeholder = hasValue ? ('/~' + index + '~/') : ''
+      let placeholder = hasValue ? PLACEHOLDER_ID : ''
 
       return `${section.value.raw}${placeholder}`
     }).join('')

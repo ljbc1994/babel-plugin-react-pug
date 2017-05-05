@@ -6,8 +6,7 @@ import type { BabelNode, BabelNodeResponse } from '../types/babel'
 import * as t from 'babel-types'
 import translations from './translations'
 
-const INTERPOLATE_REGEX = /\/~[^>]~\//g
-const NUMBER_REGEX = /[^0-9]/g
+const PLACEHOLDER_ID = '_react_pug_replace'
 
 /**
  * @class NodeBuilder
@@ -88,6 +87,10 @@ export default class NodeBuilder {
    * @returns { Object } The AST node
    */
   buildTag (tagName: string) : BabelNode {
+    if (tagName === PLACEHOLDER_ID) {
+      return this.interpolations.shift()
+    }
+
     if (tagName.charAt(0) === tagName.charAt(0).toUpperCase()) {
       return t.identifier(tagName)
     }
@@ -181,18 +184,17 @@ export default class NodeBuilder {
    * @returns { Array } The AST node(s)
    */
   interpolate (value: string, type: Function) : Array<BabelNodeResponse> {
-    const matches = value.match(INTERPOLATE_REGEX)
+    const hasReplace = value.indexOf(PLACEHOLDER_ID) > -1
 
-    if (matches && matches.length) {
-      let splitValue = value.split(INTERPOLATE_REGEX)
+    if (hasReplace) {
+      const splitValue = value.split(PLACEHOLDER_ID)
 
       return splitValue.reduce((arr, value, index) => {
         let valueArr = value ? [t.stringLiteral(value)] : []
-        let match = matches[index]
+        let interpolation = this.interpolations.shift()
 
-        if (match) {
-          let id = match.replace(NUMBER_REGEX, '')
-          valueArr.push(this.interpolations[parseInt(id)])
+        if (interpolation !== undefined) {
+          valueArr.push(interpolation)
         }
 
         return arr.concat(valueArr)
