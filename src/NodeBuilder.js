@@ -6,26 +6,26 @@ import type { BabelNode, BabelNodeResponse } from '../types/babel'
 import * as t from 'babel-types'
 import translations from './translations'
 
-const PLACEHOLDER_ID = '_react_pug_replace'
+const INTERPOLATION_REGEX = /_react_pug_replace_\d+/g
 
 /**
  * @class NodeBuilder
  */
 export default class NodeBuilder {
   ast: PugNode;
-  interpolations: Array<BabelNode>;
+  interpolations: { string: BabelNode };
 
   /**
    * @function
    * Process the ast and hook up the
    * interpolations
    * @param { Object } ast - The ast of the pug template
-   * @param { Array } interpolations - Contains the
+   * @param { Object } interpolations - Contains the
    * interpolations
    * @param { Array } blocks - Named blocks
    * @returns { Object } The react function call AST
    */
-  constructor (ast: PugNode, interpolations: Array<BabelNode>) : BabelNodeResponse {
+  constructor (ast: PugNode, interpolations: { string: BabelNode }) : BabelNodeResponse {
     this.interpolations = interpolations
 
     return this.processNode(ast)
@@ -40,8 +40,8 @@ export default class NodeBuilder {
    * @returns { Object } The react function call node
    */
   buildNode (tagName: string, attrsArr: Array<PugAttributeNode>, subNodes: BabelNodeResponse) : BabelNode {
-    if (tagName === PLACEHOLDER_ID) {
-      return this.interpolations.shift()
+    if (tagName.match(INTERPOLATION_REGEX)) {
+      return this.interpolations[tagName]
     }
 
     let fn = t.memberExpression(t.identifier('React'), t.identifier('createElement'))
@@ -184,21 +184,21 @@ export default class NodeBuilder {
    * @returns { Array } The AST node(s)
    */
   interpolate (value: string, type: Function) : Array<BabelNodeResponse> {
-    if (value === PLACEHOLDER_ID) {
-      return [ this.interpolations.shift() ]
+    if (value in this.interpolations) {
+      return [ this.interpolations[value] ]
     }
 
-    const hasReplace = value.indexOf(PLACEHOLDER_ID) > -1
+    const hasReplace = value.match(INTERPOLATION_REGEX)
 
-    if (hasReplace) {
-      const splitValue = value.split(PLACEHOLDER_ID)
+    if (hasReplace && hasReplace.length) {
+      const splitValue = value.split(INTERPOLATION_REGEX)
 
       return splitValue.reduce((arr, value, index) => {
-        let valueArr = value ? [t.stringLiteral(value)] : []
-        let interpolation = this.interpolations.shift()
+        let valueArr = value ? [ t.stringLiteral(value) ] : []
+        let interpolation = hasReplace[index]
 
-        if (interpolation !== undefined) {
-          valueArr.push(interpolation)
+        if (interpolation in this.interpolations) {
+          valueArr.push(this.interpolations[interpolation])
         }
 
         return arr.concat(valueArr)

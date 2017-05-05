@@ -24,6 +24,7 @@ const ERROR_MSGS = {
 export default class Leash {
   template: Array<BabelNode>;
   interpolations: Array<BabelNode>;
+  interpolationRef: { string: BabelNode };
   ast: PugNode;
 
   /**
@@ -35,6 +36,7 @@ export default class Leash {
    */
   constructor (template: Array<BabelNode>, interpolations: Array<BabelNode> = []) {
     this.interpolations = interpolations
+    this.interpolationRef = {}
     this.ast = this.getAST(this.manipulateTemplate(template))
   }
 
@@ -54,7 +56,7 @@ export default class Leash {
       throw new Error([ERROR_MSGS.NO_AST_NODES, ERROR_MSGS.NO_AST_EXISTS][astExists ? 0 : 1])
     }
 
-    return new NodeBuilder(rootNode, this.interpolations)
+    return new NodeBuilder(rootNode, this.interpolationRef)
   }
 
   /**
@@ -131,7 +133,12 @@ export default class Leash {
   templatePlaceholder (template: Array<BabelNode>) : string {
     return template.map((section, index) => {
       let hasValue = this.interpolations[index] !== undefined
-      let placeholder = hasValue ? PLACEHOLDER_ID : ''
+      let placeholder = hasValue ? `${PLACEHOLDER_ID}_${index}` : ''
+
+      if (placeholder.length) {
+        let interpolation = this.interpolations[index]
+        this.interpolationRef[placeholder] = interpolation
+      }
 
       return `${section.value.raw}${placeholder}`
     }).join('')

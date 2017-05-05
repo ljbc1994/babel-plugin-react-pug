@@ -1,6 +1,6 @@
 {
  "name": "babel-plugin-react-pug",
- "version": "0.4.8",
+ "version": "0.4.9",
  "description": "Convert Pug into React function calls.",
  "keywords": "pug, react, babel-plugin",
  "main": "lib/index.js",
