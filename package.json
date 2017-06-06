@@ -1,6 +1,6 @@
 {
  "name": "babel-plugin-react-pug",
- "version": "0.4.9",
+ "version": "0.5.0",
  "description": "Convert Pug into React function calls.",
  "keywords": "pug, react, babel-plugin",
  "main": "lib/index.js",
@@ -29,7 +29,7 @@
   "cross-env": "^3.2.4",
   "eslint": "^3.19.0",
   "eslint-plugin-flowtype": "^2.30.4",
-  "flow-bin": "^0.42.0",
+  "flow-bin": "^0.47.0",
   "glob": "^7.1.1",
   "mocha": "^3.2.0",
   "nyc": "^10.1.2",
@@ -38,9 +38,9 @@
  "dependencies": {
   "babel-types": "^6.23.0",
   "pug-lexer": "^3.0.0",
-  "pug-linker": "^2.0.2",
+  "pug-linker": "^3.0.1",
   "pug-load": "^2.0.5",
-  "pug-parser": "^2.0.2"
+  "pug-parser": "^3.0.0"
  },
  "standard": {
   "plugins": [

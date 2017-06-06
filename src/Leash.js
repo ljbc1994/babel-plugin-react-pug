@@ -24,7 +24,7 @@ const ERROR_MSGS = {
 export default class Leash {
   template: Array<BabelNode>;
   interpolations: Array<BabelNode>;
-  interpolationRef: { string: BabelNode };
+  interpolationRef: { [string]: BabelNode };
   ast: PugNode;
 
   /**
