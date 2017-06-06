@@ -10,6 +10,8 @@
 
 A tiny, performant babel plugin that lets you use Pug over JSX, giving you a productive and readable alternative for defining React Component templates. In essence, the plugin transforms Pug templates into React function calls. Supports React Native!
 
+> This is not the official Pug plugin for converting Pug into JSX. Please see [babel-plugin-transform-react-pug](https://github.com/pugjs/babel-plugin-transform-react-pug)!
+
 ## Example
 
 ### In
